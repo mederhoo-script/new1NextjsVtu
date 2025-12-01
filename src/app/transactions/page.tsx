@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardLayout } from '@/components/layout';
 import { Card, Select } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, getTransactionDescription } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
 const transactionTypes = [
@@ -22,6 +22,7 @@ const statusOptions = [
   { value: '', label: 'All Status' },
   { value: 'success', label: 'Success' },
   { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
   { value: 'failed', label: 'Failed' },
 ];
 
@@ -79,6 +80,7 @@ export default function TransactionsPage() {
     switch (status) {
       case 'success': return 'text-green-600 bg-green-100';
       case 'failed': return 'text-red-600 bg-red-100';
+      case 'processing': return 'text-blue-600 bg-blue-100';
       default: return 'text-yellow-600 bg-yellow-100';
     }
   };
@@ -168,7 +170,7 @@ export default function TransactionsPage() {
                           </span>
                         </td>
                         <td className="px-4 py-4">
-                          <p className="text-sm font-medium text-gray-900">{tx.description}</p>
+                          <p className="text-sm font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span className={`font-medium ${tx.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>

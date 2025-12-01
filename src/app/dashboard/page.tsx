@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardLayout } from '@/components/layout';
 import { Card } from '@/components/ui';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getTransactionDescription } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
 export default function DashboardPage() {
@@ -126,7 +126,7 @@ export default function DashboardPage() {
               {transactions.map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between py-2 border-b last:border-0">
                   <div>
-                    <p className="font-medium text-gray-900">{tx.description}</p>
+                    <p className="font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                     <p className="text-sm text-gray-500">{tx.reference}</p>
                   </div>
                   <div className="text-right">

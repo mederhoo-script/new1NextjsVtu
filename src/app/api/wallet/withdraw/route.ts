@@ -72,8 +72,7 @@ export async function POST(request: NextRequest) {
       amount: -amount,
       status: 'pending',
       reference: reference,
-      description: `Withdrawal to ${bankName}`,
-      metadata: { bank_account: bankAccount, bank_name: bankName },
+      meta: { bank_account: bankAccount, bank_name: bankName },
     });
 
     return NextResponse.json({

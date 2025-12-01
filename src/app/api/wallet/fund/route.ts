@@ -58,8 +58,7 @@ export async function POST(request: NextRequest) {
       amount: amount,
       status: 'success',
       reference: reference,
-      description: 'Wallet funding',
-      metadata: { payment_reference: paymentReference },
+      meta: { payment_reference: paymentReference },
     });
 
     if (transactionError) {

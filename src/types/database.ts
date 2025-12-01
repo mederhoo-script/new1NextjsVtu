@@ -12,27 +12,18 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          email: string;
           full_name: string | null;
-          phone: string | null;
           created_at: string;
-          updated_at: string;
         };
         Insert: {
           id: string;
-          email: string;
           full_name?: string | null;
-          phone?: string | null;
           created_at?: string;
-          updated_at?: string;
         };
         Update: {
           id?: string;
-          email?: string;
           full_name?: string | null;
-          phone?: string | null;
           created_at?: string;
-          updated_at?: string;
         };
       };
       wallets: {
@@ -40,6 +31,7 @@ export interface Database {
           id: string;
           user_id: string;
           balance: number;
+          currency: string;
           created_at: string;
           updated_at: string;
         };
@@ -47,6 +39,7 @@ export interface Database {
           id?: string;
           user_id: string;
           balance?: number;
+          currency?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -54,6 +47,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           balance?: number;
+          currency?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -62,38 +56,67 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          type: 'airtime' | 'data' | 'electricity' | 'cable' | 'education' | 'wallet_fund' | 'wallet_transfer';
+          type: string;
+          service_id: string | null;
           amount: number;
-          status: 'pending' | 'success' | 'failed';
+          charged_amount: number | null;
           reference: string;
-          description: string | null;
-          metadata: Json | null;
+          status: 'pending' | 'processing' | 'success' | 'failed';
+          meta: Json | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
-          type: 'airtime' | 'data' | 'electricity' | 'cable' | 'education' | 'wallet_fund' | 'wallet_transfer';
+          type: string;
+          service_id?: string | null;
           amount: number;
-          status?: 'pending' | 'success' | 'failed';
+          charged_amount?: number | null;
           reference: string;
-          description?: string | null;
-          metadata?: Json | null;
+          status?: 'pending' | 'processing' | 'success' | 'failed';
+          meta?: Json | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           user_id?: string;
-          type?: 'airtime' | 'data' | 'electricity' | 'cable' | 'education' | 'wallet_fund' | 'wallet_transfer';
+          type?: string;
+          service_id?: string | null;
           amount?: number;
-          status?: 'pending' | 'success' | 'failed';
+          charged_amount?: number | null;
           reference?: string;
-          description?: string | null;
-          metadata?: Json | null;
+          status?: 'pending' | 'processing' | 'success' | 'failed';
+          meta?: Json | null;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      topups: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          status: 'pending' | 'processing' | 'success' | 'failed';
+          meta: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount: number;
+          status?: 'pending' | 'processing' | 'success' | 'failed';
+          meta?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          amount?: number;
+          status?: 'pending' | 'processing' | 'success' | 'failed';
+          meta?: Json | null;
+          created_at?: string;
         };
       };
     };
@@ -107,5 +130,6 @@ export interface Database {
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Wallet = Database['public']['Tables']['wallets']['Row'];
 export type Transaction = Database['public']['Tables']['transactions']['Row'];
-export type TransactionType = Transaction['type'];
+export type Topup = Database['public']['Tables']['topups']['Row'];
 export type TransactionStatus = Transaction['status'];
+export type TopupStatus = Topup['status'];

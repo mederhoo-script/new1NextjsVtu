@@ -79,8 +79,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         status: 'pending',
         reference: reference,
-        description: `${examType} Pin(s) x${quantity}`,
-        metadata: { exam_type: examType, quantity },
+        meta: { exam_type: examType, quantity },
       })
       .select()
       .single();
@@ -114,8 +113,8 @@ export async function POST(request: NextRequest) {
           .from('transactions')
           .update({ 
             status: 'success', 
-            metadata: { 
-              ...transaction.metadata, 
+            meta: { 
+              ...transaction.meta, 
               inlomax_request_id: inlomaxResponse.request_id,
               pins: inlomaxResponse.pins,
             } 

@@ -55,8 +55,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         status: 'pending',
         reference: reference,
-        description: `${cableName} subscription - Card: ${smartCardNumber}`,
-        metadata: { cable_name: cableName, plan_id: planId, smart_card_number: smartCardNumber },
+        meta: { cable_name: cableName, plan_id: planId, smart_card_number: smartCardNumber },
       })
       .select()
       .single();
@@ -91,8 +90,8 @@ export async function POST(request: NextRequest) {
           .from('transactions')
           .update({ 
             status: 'success', 
-            metadata: { 
-              ...transaction.metadata, 
+            meta: { 
+              ...transaction.meta, 
               inlomax_request_id: inlomaxResponse.request_id,
             } 
           })

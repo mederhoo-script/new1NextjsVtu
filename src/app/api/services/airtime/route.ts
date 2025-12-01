@@ -70,8 +70,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         status: 'pending',
         reference: reference,
-        description: `${network} airtime to ${sanitizedPhone}`,
-        metadata: { network, phone_number: sanitizedPhone, airtime_type: airtimeType },
+        meta: { network, phone_number: sanitizedPhone, airtime_type: airtimeType },
       })
       .select()
       .single();
@@ -108,8 +107,8 @@ export async function POST(request: NextRequest) {
           .from('transactions')
           .update({ 
             status: 'success', 
-            metadata: { 
-              ...transaction.metadata, 
+            meta: { 
+              ...transaction.meta, 
               inlomax_request_id: inlomaxResponse.request_id 
             } 
           })

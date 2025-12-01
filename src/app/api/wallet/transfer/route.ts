@@ -131,8 +131,7 @@ export async function POST(request: NextRequest) {
       amount: -amount,
       status: 'success',
       reference: reference,
-      description: `Transfer to ${recipientEmail}`,
-      metadata: { recipient_id: recipient.id, recipient_email: recipientEmail },
+      meta: { recipient_id: recipient.id, recipient_email: recipientEmail },
     });
 
     // Record recipient's transaction
@@ -142,8 +141,7 @@ export async function POST(request: NextRequest) {
       amount: amount,
       status: 'success',
       reference: reference,
-      description: `Transfer from ${user.email}`,
-      metadata: { sender_id: user.id, sender_email: user.email },
+      meta: { sender_id: user.id, sender_email: user.email },
     });
 
     return NextResponse.json({

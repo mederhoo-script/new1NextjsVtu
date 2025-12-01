@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardLayout } from '@/components/layout';
 import { Card, Button, Input, Alert } from '@/components/ui';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getTransactionDescription } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
 export default function WalletPage() {
@@ -136,6 +136,7 @@ export default function WalletPage() {
     switch (status) {
       case 'success': return 'text-green-600 bg-green-100';
       case 'failed': return 'text-red-600 bg-red-100';
+      case 'processing': return 'text-blue-600 bg-blue-100';
       default: return 'text-yellow-600 bg-yellow-100';
     }
   };
@@ -265,7 +266,7 @@ export default function WalletPage() {
                 {transactions.map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between py-2 border-b last:border-0">
                     <div>
-                      <p className="font-medium text-gray-900">{tx.description}</p>
+                      <p className="font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                       <p className="text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="text-right">

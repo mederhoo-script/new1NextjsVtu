@@ -62,8 +62,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         status: 'pending',
         reference: reference,
-        description: `${disco} electricity bill - Meter: ${meterNumber}`,
-        metadata: { disco, meter_number: meterNumber, meter_type: meterType },
+        meta: { disco, meter_number: meterNumber, meter_type: meterType },
       })
       .select()
       .single();
@@ -99,8 +98,8 @@ export async function POST(request: NextRequest) {
           .from('transactions')
           .update({ 
             status: 'success', 
-            metadata: { 
-              ...transaction.metadata, 
+            meta: { 
+              ...transaction.meta, 
               inlomax_request_id: inlomaxResponse.request_id,
               token: inlomaxResponse.token,
               units: inlomaxResponse.units,
