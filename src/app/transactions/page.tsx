@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardLayout } from '@/components/layout';
 import { Card, Select } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, getTransactionDescription } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
 const transactionTypes = [
@@ -25,29 +25,6 @@ const statusOptions = [
   { value: 'processing', label: 'Processing' },
   { value: 'failed', label: 'Failed' },
 ];
-
-// Helper function to generate transaction description from type and meta
-function getTransactionDescription(tx: Transaction): string {
-  const meta = tx.meta as Record<string, unknown> | null;
-  switch (tx.type) {
-    case 'airtime':
-      return meta?.phone_number ? `Airtime to ${meta.phone_number}` : 'Airtime Purchase';
-    case 'data':
-      return meta?.phone_number ? `Data to ${meta.phone_number}` : 'Data Purchase';
-    case 'electricity':
-      return meta?.meter_number ? `Electricity - Meter: ${meta.meter_number}` : 'Electricity Payment';
-    case 'cable':
-      return meta?.smart_card_number ? `Cable - Card: ${meta.smart_card_number}` : 'Cable Subscription';
-    case 'education':
-      return meta?.exam_type ? `${meta.exam_type} Pin` : 'Education Pin';
-    case 'wallet_fund':
-      return 'Wallet Funding';
-    case 'wallet_transfer':
-      return 'Wallet Transfer';
-    default:
-      return tx.type;
-  }
-}
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);

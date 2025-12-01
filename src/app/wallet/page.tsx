@@ -4,21 +4,8 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { DashboardLayout } from '@/components/layout';
 import { Card, Button, Input, Alert } from '@/components/ui';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getTransactionDescription } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
-
-// Helper function to generate transaction description from type and meta
-function getTransactionDescription(tx: Transaction): string {
-  const meta = tx.meta as Record<string, unknown> | null;
-  switch (tx.type) {
-    case 'wallet_fund':
-      return meta?.payment_reference ? `Wallet Funding - ${meta.payment_reference}` : 'Wallet Funding';
-    case 'wallet_transfer':
-      return meta?.recipient_email ? `Transfer to ${meta.recipient_email}` : 'Wallet Transfer';
-    default:
-      return tx.type;
-  }
-}
 
 export default function WalletPage() {
   const [balance, setBalance] = useState(0);

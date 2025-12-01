@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import type { Transaction } from '@/types/database';
 
 export function generateReference(): string {
   const timestamp = Date.now().toString(36);
@@ -65,4 +66,29 @@ export function getNetworkFromPhone(phone: string): string | null {
   if (nineMobilePrefixes.includes(prefix)) return '9MOBILE';
   
   return null;
+}
+
+/**
+ * Generate a human-readable description from a transaction's type and meta data
+ */
+export function getTransactionDescription(tx: Transaction): string {
+  const meta = tx.meta as Record<string, unknown> | null;
+  switch (tx.type) {
+    case 'airtime':
+      return meta?.phone_number ? `Airtime to ${meta.phone_number}` : 'Airtime Purchase';
+    case 'data':
+      return meta?.phone_number ? `Data to ${meta.phone_number}` : 'Data Purchase';
+    case 'electricity':
+      return meta?.meter_number ? `Electricity - Meter: ${meta.meter_number}` : 'Electricity Payment';
+    case 'cable':
+      return meta?.smart_card_number ? `Cable - Card: ${meta.smart_card_number}` : 'Cable Subscription';
+    case 'education':
+      return meta?.exam_type ? `${meta.exam_type} Pin` : 'Education Pin';
+    case 'wallet_fund':
+      return meta?.payment_reference ? `Wallet Funding - ${meta.payment_reference}` : 'Wallet Funding';
+    case 'wallet_transfer':
+      return meta?.recipient_email ? `Transfer to ${meta.recipient_email}` : 'Wallet Transfer';
+    default:
+      return tx.type;
+  }
 }
