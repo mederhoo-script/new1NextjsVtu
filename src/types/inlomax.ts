@@ -4,6 +4,31 @@ export interface InlomaxBaseResponse {
   message: string;
 }
 
+// Services Response
+export interface InlomaxServicesResponse extends InlomaxBaseResponse {
+  services?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    description?: string;
+  }>;
+}
+
+// Balance Response
+export interface InlomaxBalanceResponse extends InlomaxBaseResponse {
+  balance: number;
+}
+
+// Transaction Details Response
+export interface InlomaxTransactionDetailsResponse extends InlomaxBaseResponse {
+  request_id?: string;
+  type?: string;
+  amount?: number;
+  transaction_status?: string;
+  date?: string;
+  details?: Record<string, unknown>;
+}
+
 export interface InlomaxAirtimeRequest {
   network: string;
   amount: number;

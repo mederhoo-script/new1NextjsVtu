@@ -22,8 +22,32 @@ const statusOptions = [
   { value: '', label: 'All Status' },
   { value: 'success', label: 'Success' },
   { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
   { value: 'failed', label: 'Failed' },
 ];
+
+// Helper function to generate transaction description from type and meta
+function getTransactionDescription(tx: Transaction): string {
+  const meta = tx.meta as Record<string, unknown> | null;
+  switch (tx.type) {
+    case 'airtime':
+      return meta?.phone_number ? `Airtime to ${meta.phone_number}` : 'Airtime Purchase';
+    case 'data':
+      return meta?.phone_number ? `Data to ${meta.phone_number}` : 'Data Purchase';
+    case 'electricity':
+      return meta?.meter_number ? `Electricity - Meter: ${meta.meter_number}` : 'Electricity Payment';
+    case 'cable':
+      return meta?.smart_card_number ? `Cable - Card: ${meta.smart_card_number}` : 'Cable Subscription';
+    case 'education':
+      return meta?.exam_type ? `${meta.exam_type} Pin` : 'Education Pin';
+    case 'wallet_fund':
+      return 'Wallet Funding';
+    case 'wallet_transfer':
+      return 'Wallet Transfer';
+    default:
+      return tx.type;
+  }
+}
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -79,6 +103,7 @@ export default function TransactionsPage() {
     switch (status) {
       case 'success': return 'text-green-600 bg-green-100';
       case 'failed': return 'text-red-600 bg-red-100';
+      case 'processing': return 'text-blue-600 bg-blue-100';
       default: return 'text-yellow-600 bg-yellow-100';
     }
   };
@@ -168,7 +193,7 @@ export default function TransactionsPage() {
                           </span>
                         </td>
                         <td className="px-4 py-4">
-                          <p className="text-sm font-medium text-gray-900">{tx.description}</p>
+                          <p className="text-sm font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span className={`font-medium ${tx.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>

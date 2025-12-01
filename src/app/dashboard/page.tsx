@@ -8,6 +8,29 @@ import { Card } from '@/components/ui';
 import { formatCurrency } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
+// Helper function to generate transaction description from type and meta
+function getTransactionDescription(tx: Transaction): string {
+  const meta = tx.meta as Record<string, unknown> | null;
+  switch (tx.type) {
+    case 'airtime':
+      return meta?.phone_number ? `Airtime to ${meta.phone_number}` : 'Airtime Purchase';
+    case 'data':
+      return meta?.phone_number ? `Data to ${meta.phone_number}` : 'Data Purchase';
+    case 'electricity':
+      return meta?.meter_number ? `Electricity - Meter: ${meta.meter_number}` : 'Electricity Payment';
+    case 'cable':
+      return meta?.smart_card_number ? `Cable - Card: ${meta.smart_card_number}` : 'Cable Subscription';
+    case 'education':
+      return meta?.exam_type ? `${meta.exam_type} Pin` : 'Education Pin';
+    case 'wallet_fund':
+      return 'Wallet Funding';
+    case 'wallet_transfer':
+      return 'Wallet Transfer';
+    default:
+      return tx.type;
+  }
+}
+
 export default function DashboardPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -126,7 +149,7 @@ export default function DashboardPage() {
               {transactions.map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between py-2 border-b last:border-0">
                   <div>
-                    <p className="font-medium text-gray-900">{tx.description}</p>
+                    <p className="font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                     <p className="text-sm text-gray-500">{tx.reference}</p>
                   </div>
                   <div className="text-right">

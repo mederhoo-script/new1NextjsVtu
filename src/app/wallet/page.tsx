@@ -7,6 +7,19 @@ import { Card, Button, Input, Alert } from '@/components/ui';
 import { formatCurrency } from '@/lib/utils';
 import type { Transaction } from '@/types/database';
 
+// Helper function to generate transaction description from type and meta
+function getTransactionDescription(tx: Transaction): string {
+  const meta = tx.meta as Record<string, unknown> | null;
+  switch (tx.type) {
+    case 'wallet_fund':
+      return meta?.payment_reference ? `Wallet Funding - ${meta.payment_reference}` : 'Wallet Funding';
+    case 'wallet_transfer':
+      return meta?.recipient_email ? `Transfer to ${meta.recipient_email}` : 'Wallet Transfer';
+    default:
+      return tx.type;
+  }
+}
+
 export default function WalletPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -136,6 +149,7 @@ export default function WalletPage() {
     switch (status) {
       case 'success': return 'text-green-600 bg-green-100';
       case 'failed': return 'text-red-600 bg-red-100';
+      case 'processing': return 'text-blue-600 bg-blue-100';
       default: return 'text-yellow-600 bg-yellow-100';
     }
   };
@@ -265,7 +279,7 @@ export default function WalletPage() {
                 {transactions.map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between py-2 border-b last:border-0">
                     <div>
-                      <p className="font-medium text-gray-900">{tx.description}</p>
+                      <p className="font-medium text-gray-900">{getTransactionDescription(tx)}</p>
                       <p className="text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="text-right">

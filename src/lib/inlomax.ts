@@ -13,22 +13,29 @@ import {
   InlomaxVerifyMeterResponse,
   InlomaxVerifySmartCardRequest,
   InlomaxVerifySmartCardResponse,
+  InlomaxServicesResponse,
+  InlomaxBalanceResponse,
+  InlomaxTransactionDetailsResponse,
 } from '@/types/inlomax';
 
 const INLOMAX_BASE_URL = process.env.INLOMAX_API_URL || 'https://www.inlomax.com/api';
-const INLOMAX_TOKEN = process.env.INLOMAX_API_TOKEN;
+
+function getApiKey(): string {
+  const apiKey = process.env.INLOMAX_API_KEY;
+  if (!apiKey) {
+    throw new Error('INLOMAX_API_KEY environment variable is not configured');
+  }
+  return apiKey;
+}
 
 async function makeRequest<T>(endpoint: string, method: 'GET' | 'POST' = 'POST', body?: object): Promise<T> {
-  if (!INLOMAX_TOKEN) {
-    throw new Error('Inlomax API token not configured');
-  }
-
+  const apiKey = getApiKey();
   const url = `${INLOMAX_BASE_URL}${endpoint}`;
   
   const response = await fetch(url, {
     method,
     headers: {
-      'Authorization': `Token ${INLOMAX_TOKEN}`,
+      'Authorization': `Token ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -42,64 +49,97 @@ async function makeRequest<T>(endpoint: string, method: 'GET' | 'POST' = 'POST',
   return response.json();
 }
 
+// Get available services
+export async function getServices(): Promise<InlomaxServicesResponse> {
+  return makeRequest<InlomaxServicesResponse>('/services/', 'GET');
+}
+
+// Get Wallet Balance from Inlomax
+export async function getBalance(): Promise<InlomaxBalanceResponse> {
+  return makeRequest<InlomaxBalanceResponse>('/balance/', 'GET');
+}
+
 // Airtime VTU
-export async function purchaseAirtime(data: InlomaxAirtimeRequest): Promise<InlomaxAirtimeResponse> {
+export async function airtime(data: InlomaxAirtimeRequest): Promise<InlomaxAirtimeResponse> {
   return makeRequest<InlomaxAirtimeResponse>('/topup/', 'POST', data);
 }
 
 // Data VTU
-export async function purchaseData(data: InlomaxDataRequest): Promise<InlomaxDataResponse> {
-  return makeRequest<InlomaxDataResponse>('/data/', 'POST', data);
+export async function data(dataRequest: InlomaxDataRequest): Promise<InlomaxDataResponse> {
+  return makeRequest<InlomaxDataResponse>('/data/', 'POST', dataRequest);
 }
 
-// Get data plans
-export async function getDataPlans(network: string): Promise<{ plans: { plan_id: string; plan: string; amount: number }[] }> {
-  return makeRequest<{ plans: { plan_id: string; plan: string; amount: number }[] }>(`/get_data_plans/?network=${network}`, 'GET');
+// Validate Cable Smart Card
+export async function validateCable(cableData: InlomaxVerifySmartCardRequest): Promise<InlomaxVerifySmartCardResponse> {
+  return makeRequest<InlomaxVerifySmartCardResponse>('/validateiuc/', 'POST', cableData);
 }
 
-// Electricity Bill Payment
-export async function payElectricityBill(data: InlomaxElectricityRequest): Promise<InlomaxElectricityResponse> {
-  return makeRequest<InlomaxElectricityResponse>('/billpayment/', 'POST', data);
+// Subscribe Cable TV
+export async function subCable(cableData: InlomaxCableRequest): Promise<InlomaxCableResponse> {
+  return makeRequest<InlomaxCableResponse>('/cablesub/', 'POST', cableData);
 }
 
-// Verify Meter Number
-export async function verifyMeterNumber(data: InlomaxVerifyMeterRequest): Promise<InlomaxVerifyMeterResponse> {
-  return makeRequest<InlomaxVerifyMeterResponse>('/validatemeter/', 'POST', data);
+// Validate Meter Number
+export async function validateMeter(meterData: InlomaxVerifyMeterRequest): Promise<InlomaxVerifyMeterResponse> {
+  return makeRequest<InlomaxVerifyMeterResponse>('/validatemeter/', 'POST', meterData);
 }
 
-// Cable TV Subscription
-export async function subscribeCableTV(data: InlomaxCableRequest): Promise<InlomaxCableResponse> {
-  return makeRequest<InlomaxCableResponse>('/cablesub/', 'POST', data);
-}
-
-// Get Cable Plans
-export async function getCablePlans(cablename: string): Promise<{ plans: { plan_id: string; name: string; amount: number }[] }> {
-  return makeRequest<{ plans: { plan_id: string; name: string; amount: number }[] }>(`/get_cable_plans/?cablename=${cablename}`, 'GET');
-}
-
-// Verify Smart Card
-export async function verifySmartCard(data: InlomaxVerifySmartCardRequest): Promise<InlomaxVerifySmartCardResponse> {
-  return makeRequest<InlomaxVerifySmartCardResponse>('/validateiuc/', 'POST', data);
+// Pay Electricity Bill
+export async function payElectric(electricData: InlomaxElectricityRequest): Promise<InlomaxElectricityResponse> {
+  return makeRequest<InlomaxElectricityResponse>('/billpayment/', 'POST', electricData);
 }
 
 // Education Pins
-export async function purchaseEducationPins(data: InlomaxEducationRequest): Promise<InlomaxEducationResponse> {
-  return makeRequest<InlomaxEducationResponse>('/epin/', 'POST', data);
+export async function education(educationData: InlomaxEducationRequest): Promise<InlomaxEducationResponse> {
+  return makeRequest<InlomaxEducationResponse>('/epin/', 'POST', educationData);
 }
 
-// Get Wallet Balance from Inlomax
-export async function getInlomaxBalance(): Promise<{ balance: number }> {
-  return makeRequest<{ balance: number }>('/balance/', 'GET');
+// Get Transaction Details
+export async function transactionDetails(requestId: string): Promise<InlomaxTransactionDetailsResponse> {
+  return makeRequest<InlomaxTransactionDetailsResponse>(`/transaction/?request_id=${encodeURIComponent(requestId)}`, 'GET');
 }
+
+// Get data plans (additional utility)
+export async function getDataPlans(network: string): Promise<{ plans: { plan_id: string; plan: string; amount: number }[] }> {
+  return makeRequest<{ plans: { plan_id: string; plan: string; amount: number }[] }>(`/get_data_plans/?network=${encodeURIComponent(network)}`, 'GET');
+}
+
+// Get Cable Plans (additional utility)
+export async function getCablePlans(cablename: string): Promise<{ plans: { plan_id: string; name: string; amount: number }[] }> {
+  return makeRequest<{ plans: { plan_id: string; name: string; amount: number }[] }>(`/get_cable_plans/?cablename=${encodeURIComponent(cablename)}`, 'GET');
+}
+
+// Legacy exports for backward compatibility
+export const purchaseAirtime = airtime;
+export const purchaseData = data;
+export const payElectricityBill = payElectric;
+export const verifyMeterNumber = validateMeter;
+export const subscribeCableTV = subCable;
+export const verifySmartCard = validateCable;
+export const purchaseEducationPins = education;
+export const getInlomaxBalance = getBalance;
 
 export const inlomaxService = {
+  // Required functions per specification
+  getServices,
+  getBalance,
+  airtime,
+  data,
+  validateCable,
+  subCable,
+  validateMeter,
+  payElectric,
+  education,
+  transactionDetails,
+  // Additional utility functions
+  getDataPlans,
+  getCablePlans,
+  // Legacy aliases for backward compatibility
   purchaseAirtime,
   purchaseData,
-  getDataPlans,
   payElectricityBill,
   verifyMeterNumber,
   subscribeCableTV,
-  getCablePlans,
   verifySmartCard,
   purchaseEducationPins,
   getInlomaxBalance,
